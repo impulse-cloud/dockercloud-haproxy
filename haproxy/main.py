@@ -1,13 +1,14 @@
 import logging
 import os
 import signal
+import subprocess
 import sys
 
 import dockercloud
 from compose.cli.docker_client import docker_client
 
 import config
-from config import DEBUG, PID_FILE, HAPROXY_CONTAINER_URI, HAPROXY_SERVICE_URI, API_AUTH
+from config import DEBUG, PID_FILE, HAPROXY_CONTAINER_URI, HAPROXY_SERVICE_URI, API_AUTH, SHELL_CMD
 from eventhandler import on_user_reload, listen_docker_events, listen_dockercloud_events
 from haproxy import __version__
 from haproxycfg import run_haproxy
@@ -40,6 +41,9 @@ def main():
 
     pid = create_pid_file()
     logger.info("dockercloud/haproxy PID: %s" % pid)
+
+    if SHELL_CMD:
+        subprocess.call(SHELL_CMD, shell=True)
 
     if config.LINK_MODE == "cloud":
         listen_dockercloud_events()
